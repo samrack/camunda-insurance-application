@@ -1,0 +1,338 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="https://www.omg.org/spec/DMN/20191111/MODEL/" xmlns:dmndi="https://www.omg.org/spec/DMN/20191111/DMNDI/" xmlns:dc="http://www.omg.org/spec/DMN/20180521/DC/" xmlns:camunda="http://camunda.org/schema/1.0/dmn" xmlns:di="http://www.omg.org/spec/DMN/20180521/DI/" id="vypocetRizika" name="DRD" namespace="http://camunda.org/schema/1.0/dmn" exporter="Camunda Modeler" exporterVersion="4.6.0">
+  <decision id="Decision_risk" name="Výpočet rizika">
+    <informationRequirement id="InformationRequirement_12ukjxg">
+      <requiredDecision href="#Decision_driver_experience" />
+    </informationRequirement>
+    <informationRequirement id="InformationRequirement_1o32pif">
+      <requiredDecision href="#Decision_car_age" />
+    </informationRequirement>
+    <decisionTable id="DecisionTable_1k1uxo1" hitPolicy="FIRST">
+      <input id="InputClause_15li41j" label="Skúsenosť" camunda:inputVariable="ageCategory">
+        <inputExpression id="LiteralExpression_0gqh9oq" typeRef="string">
+          <text></text>
+        </inputExpression>
+        <inputValues id="UnaryTests_1knvhpx">
+          <text>"experienced","not experienced"</text>
+        </inputValues>
+      </input>
+      <input id="InputClause_1r3ailo" label="Výrobca" camunda:inputVariable="carBrand">
+        <inputExpression id="LiteralExpression_0xdfzg0" typeRef="string">
+          <text></text>
+        </inputExpression>
+        <inputValues id="UnaryTests_0ndw5e0">
+          <text>"Audi","Porsche","Skoda","Toyota"</text>
+        </inputValues>
+      </input>
+      <input id="InputClause_175ibeh" label="Výkon motora" camunda:inputVariable="performance">
+        <inputExpression id="LiteralExpression_0rz7spu" typeRef="integer">
+          <text></text>
+        </inputExpression>
+      </input>
+      <input id="InputClause_0qamfn0" label="Vek vozidla" camunda:inputVariable="carAge">
+        <inputExpression id="LiteralExpression_1x2z3b4" typeRef="string">
+          <text></text>
+        </inputExpression>
+        <inputValues id="UnaryTests_1gk4nil">
+          <text>"newer","older","old"</text>
+        </inputValues>
+      </input>
+      <output id="Output_1" name="risk_decision" typeRef="string">
+        <outputValues id="UnaryTests_1kyb4et">
+          <text>"high","medium","low","unmatched"</text>
+        </outputValues>
+      </output>
+      <rule id="DecisionRule_0gcgav6">
+        <description>Staré vozidlo</description>
+        <inputEntry id="UnaryTests_0vuuj5n">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_0qdgqfm">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_0xqpiek">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_0mt83bx">
+          <text>"old"</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_1d4qsxa">
+          <text>"high"</text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_1k7zzne">
+        <description>Veľký výkon</description>
+        <inputEntry id="UnaryTests_0p648ku">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_0xjbob9">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_0b51sfl">
+          <text>&gt;= 200</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_0ptswbu">
+          <text></text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_029vdj9">
+          <text>"high"</text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_1r1rn6j">
+        <description>Neskúsený vodič, rizikové značky</description>
+        <inputEntry id="UnaryTests_1dypsnl">
+          <text>"not experienced"</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_08m5vmt">
+          <text>"Audi","Porsche"</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_16agfc3">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_0s4sir6">
+          <text></text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_01zci4l">
+          <text>"high"</text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_1w3o8ih">
+        <description>Neskúsený vodič, stredný výkon, stredne staré vozidlo</description>
+        <inputEntry id="UnaryTests_1644h3x">
+          <text>"not experienced"</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_1wanfal">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_0gaqcj7">
+          <text>&gt;= 100</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_1ccvr28">
+          <text>"older"</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_0bzm2ip">
+          <text>"high"</text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_0a4fhol">
+        <description>Neskúsený vodič, stredný výkon, novšie vozidlo</description>
+        <inputEntry id="UnaryTests_05r01q0">
+          <text>"not experienced"</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_0ie3n38">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_0cxo80l">
+          <text>&gt;= 100</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_0qjexi9">
+          <text>"newer"</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_16xisq5">
+          <text>"medium"</text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_1drz4ch">
+        <description>Neskúsený vodič,  malý výkon,  stredne staré vozidlo</description>
+        <inputEntry id="UnaryTests_0r80lx9">
+          <text>"not experienced"</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_0noriv8">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_056ibk0">
+          <text>&lt; 100</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_149zi3p">
+          <text>"older"</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_1j2dbr8">
+          <text>"medium"</text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_1773gbb">
+        <description>Skúsený vodič, stredný výkon, stredne staré vozidlo</description>
+        <inputEntry id="UnaryTests_0vbewiw">
+          <text>"experienced"</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_0q3ynlz">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_0ot7p7f">
+          <text>&gt;= 100</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_1t2nobh">
+          <text>"older"</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_0mldfah">
+          <text>"medium"</text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_14nbrna">
+        <description>Skúsený vodič, stredný výkon, novšie vozidlo</description>
+        <inputEntry id="UnaryTests_02pp4mk">
+          <text>"experienced"</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_03i6eol">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_1wn8ua0">
+          <text>&gt;= 100</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_0dc21vv">
+          <text>"newer"</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_1kxm9e6">
+          <text>"low"</text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_1bs0cut">
+        <description>Neskúsený vodič, malý výkon, novšie vozidlo</description>
+        <inputEntry id="UnaryTests_0i6ddf6">
+          <text>"not experienced"</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_01h58lh">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_1fsklzz">
+          <text>&lt; 100</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_1yvt7we">
+          <text>"newer"</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_13ri4ek">
+          <text>"low"</text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_1w4hlvn">
+        <description>Skúsený vodič, malý výkon, stredne staré vozidlo</description>
+        <inputEntry id="UnaryTests_1avkoxb">
+          <text>"experienced"</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_1v8m9eq">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_0n41vnu">
+          <text>&lt; 100</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_1oeyunv">
+          <text>"older"</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_01g6hlo">
+          <text>"low"</text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_1456h9l">
+        <inputEntry id="UnaryTests_1d0vadi">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_0gwxvyq">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_0t6ttm1">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_1h2o36k">
+          <text></text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_0t9b9hn">
+          <text>"unmatched"</text>
+        </outputEntry>
+      </rule>
+    </decisionTable>
+  </decision>
+  <decision id="Decision_driver_experience" name="Určenie skúseností vodiča">
+    <decisionTable id="DecisionTable_15csq3w" hitPolicy="FIRST">
+      <input id="InputClause_05ncuw0" label="Dátum narodenia" camunda:inputVariable="datumNar">
+        <inputExpression id="LiteralExpression_0fqy44v" typeRef="date" />
+      </input>
+      <output id="OutputClause_1rtshak" label="Skúsenosť" name="ageCategory" typeRef="string">
+        <outputValues id="UnaryTests_1wobul6">
+          <text>"experienced","not experienced"</text>
+        </outputValues>
+      </output>
+      <rule id="DecisionRule_01gftbw">
+        <description>Vodič má viac ako 25 rokov</description>
+        <inputEntry id="UnaryTests_1bf8ywm">
+          <text>&lt; date and time("1996-04-18T00:00:00")</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_1bl099x">
+          <text>"experienced"</text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_09fltqz">
+        <description>Vodič má menej ako 25 rokov</description>
+        <inputEntry id="UnaryTests_1tipyj6">
+          <text>&gt; date and time("1996-03-17T00:00:00")</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_14i9dlr">
+          <text>"not experienced"</text>
+        </outputEntry>
+      </rule>
+    </decisionTable>
+  </decision>
+  <decision id="Decision_car_age" name="Určenie veku vozidla">
+    <decisionTable id="DecisionTable_0eho9m9" hitPolicy="FIRST">
+      <input id="InputClause_1dmh6kv" label="Rok evidencie vozidla" camunda:inputVariable="evidenceYear">
+        <inputExpression id="LiteralExpression_1mo1u8k" typeRef="long">
+          <text></text>
+        </inputExpression>
+      </input>
+      <output id="OutputClause_1yv5x61" label="Veková kategória" name="carAge" typeRef="string">
+        <outputValues id="UnaryTests_1db5zuq">
+          <text>"newer","older","old"</text>
+        </outputValues>
+      </output>
+      <rule id="DecisionRule_1n5sfs0">
+        <description>Prvá evidencia vozidla po roku 2015</description>
+        <inputEntry id="UnaryTests_0d1pze4">
+          <text>&gt; 2015</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_11r0yd9">
+          <text>"newer"</text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_1qjg2f2">
+        <description>Prvá evidencia vozidla po roku 2005 do roku 2015 vrátane</description>
+        <inputEntry id="UnaryTests_04i3o3o">
+          <text>[2005..2015]</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_199itsz">
+          <text>"older"</text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_13mdcns">
+        <description>Prvá evidencia vozidla pred rokom 2005</description>
+        <inputEntry id="UnaryTests_1r43t3e">
+          <text>&lt; 2005</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_1t7ko61">
+          <text>"old"</text>
+        </outputEntry>
+      </rule>
+    </decisionTable>
+  </decision>
+  <dmndi:DMNDI>
+    <dmndi:DMNDiagram>
+      <dmndi:DMNShape dmnElementRef="Decision_risk">
+        <dc:Bounds height="80" width="180" x="160" y="110" />
+      </dmndi:DMNShape>
+      <dmndi:DMNEdge id="DMNEdge_1vvd45h" dmnElementRef="InformationRequirement_12ukjxg">
+        <di:waypoint x="140" y="330" />
+        <di:waypoint x="220" y="210" />
+        <di:waypoint x="220" y="190" />
+      </dmndi:DMNEdge>
+      <dmndi:DMNShape id="DMNShape_1q5uwwq" dmnElementRef="Decision_driver_experience">
+        <dc:Bounds height="80" width="180" x="50" y="330" />
+      </dmndi:DMNShape>
+      <dmndi:DMNEdge id="DMNEdge_16y4y19" dmnElementRef="InformationRequirement_1o32pif">
+        <di:waypoint x="380" y="330" />
+        <di:waypoint x="280" y="210" />
+        <di:waypoint x="280" y="190" />
+      </dmndi:DMNEdge>
+      <dmndi:DMNShape id="DMNShape_0mhxjuf" dmnElementRef="Decision_car_age">
+        <dc:Bounds height="80" width="180" x="290" y="330" />
+      </dmndi:DMNShape>
+    </dmndi:DMNDiagram>
+  </dmndi:DMNDI>
+</definitions>

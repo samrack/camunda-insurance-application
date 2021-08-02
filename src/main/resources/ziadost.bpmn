@@ -1,0 +1,302 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_1uvjh8a" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="4.6.0">
+  <bpmn:collaboration id="Collaboration_1jo87qk">
+    <bpmn:participant id="Participant_0xk7y9f" name="Žiadosť o poistenie" processRef="Process_0ym2bz8" />
+  </bpmn:collaboration>
+  <bpmn:process id="Process_0ym2bz8" name="Nová žiadost o poistenie" isExecutable="true" camunda:candidateStarterGroups="agenti">
+    <bpmn:callActivity id="Activity_call_approval" name="Schvaľovanie" calledElement="process_approval">
+      <bpmn:extensionElements>
+        <camunda:in variables="all" />
+        <camunda:out source="approved" target="approved" />
+        <camunda:out source="price" target="price" />
+        <camunda:out source="duplicity" target="duplicity" />
+        <camunda:out source="risk_decison" target="risk_decision" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0lujkmt</bpmn:incoming>
+      <bpmn:outgoing>Flow_0h3c7d0</bpmn:outgoing>
+    </bpmn:callActivity>
+    <bpmn:boundaryEvent id="Event_0s7nyf3" attachedToRef="Activity_call_approval">
+      <bpmn:outgoing>Flow_0fpsozt</bpmn:outgoing>
+      <bpmn:errorEventDefinition id="ErrorEventDefinition_1ccvzy8" camunda:errorMessageVariable="errorMessage" />
+    </bpmn:boundaryEvent>
+    <bpmn:sequenceFlow id="Flow_0h3c7d0" name="Schválená" sourceRef="Activity_call_approval" targetRef="Activity_1uz13wt" />
+    <bpmn:sequenceFlow id="Flow_1fd4p45" sourceRef="Activity_1uz13wt" targetRef="Event_0nxnvgi" />
+    <bpmn:sequenceFlow id="Flow_0fpsozt" name="Zamietnutá" sourceRef="Event_0s7nyf3" targetRef="Activity_05sedak" />
+    <bpmn:sequenceFlow id="Flow_1ka9u10" sourceRef="Activity_05sedak" targetRef="Event_0hunqu4" />
+    <bpmn:sequenceFlow id="Flow_09cdwkt" sourceRef="StartEvent_1" targetRef="Activity_01c8ubq" />
+    <bpmn:startEvent id="StartEvent_1" name="Vytvorenie žiadosti">
+      <bpmn:extensionElements>
+        <camunda:executionListener event="start">
+          <camunda:script scriptFormat="groovy">execution.setVariable('meno','')
+execution.setVariable('priezvisko','')
+execution.setVariable('emailAddress','')
+execution.setVariable('carBrand','brandSkoda')
+execution.setVariable('engineVolume',0)
+execution.setVariable('evidenceYear',0)
+execution.setVariable('performance',0)
+execution.setVariable('spz','')
+execution.setVariable('approved', 'false')
+execution.setVariable('accepted', 'notAccepted')
+execution.setVariable('price', 0)
+execution.setVariable('duplicity', 'false')
+execution.setVariable('errorMessage', '')
+execution.setVariable('risk_decision', '')
+execution.setVariable('processId', execution.getId())
+
+pattern = "yyyy-MM-dd'T'HH:mm:ss"
+input = "1990-01-25T13:33:42"
+date = Date.parse(pattern, input)
+execution.setVariable('datumNar', date)</camunda:script>
+        </camunda:executionListener>
+      </bpmn:extensionElements>
+      <bpmn:outgoing>Flow_09cdwkt</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:endEvent id="Event_0nxnvgi">
+      <bpmn:incoming>Flow_1fd4p45</bpmn:incoming>
+      <bpmn:terminateEventDefinition id="TerminateEventDefinition_0zd0soy" />
+    </bpmn:endEvent>
+    <bpmn:userTask id="Activity_05sedak" name="Oznámenie dôvodu zamietnutia" camunda:candidateGroups="agenti">
+      <bpmn:extensionElements>
+        <camunda:formData>
+          <camunda:formField id="errorMessage" label="Dôvod zametnutia" type="string">
+            <camunda:validation>
+              <camunda:constraint name="readonly" />
+            </camunda:validation>
+          </camunda:formField>
+        </camunda:formData>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0fpsozt</bpmn:incoming>
+      <bpmn:outgoing>Flow_1ka9u10</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:endEvent id="Event_0hunqu4">
+      <bpmn:incoming>Flow_1ka9u10</bpmn:incoming>
+      <bpmn:terminateEventDefinition id="TerminateEventDefinition_13l5dos" />
+    </bpmn:endEvent>
+    <bpmn:sendTask id="Activity_1uz13wt" name="Odoslanie zmluvy ">
+      <bpmn:extensionElements>
+        <camunda:connector>
+          <camunda:inputOutput>
+            <camunda:inputParameter name="text">Ďakujeme, že ste sa u nás poistili. Zasielame Vám číslo zmluvy, ktorou sa môžete pri najbližšom kontakte s nami identifikovať.
+
+
+Číslo zmluvy: ${execution.getId()}
+Cena poistenia: ${price}</camunda:inputParameter>
+            <camunda:inputParameter name="subject">Zmluva pre vozidlo ${spz}</camunda:inputParameter>
+            <camunda:inputParameter name="to">${emailAddress}</camunda:inputParameter>
+          </camunda:inputOutput>
+          <camunda:connectorId>mail-send</camunda:connectorId>
+        </camunda:connector>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0h3c7d0</bpmn:incoming>
+      <bpmn:outgoing>Flow_1fd4p45</bpmn:outgoing>
+    </bpmn:sendTask>
+    <bpmn:sequenceFlow id="Flow_0lujkmt" sourceRef="Activity_01c8ubq" targetRef="Activity_call_approval" />
+    <bpmn:userTask id="Activity_01c8ubq" name="Vyplnenie informácií o žiadosti" camunda:candidateGroups="agenti">
+      <bpmn:extensionElements>
+        <camunda:formData>
+          <camunda:formField id="meno" label="Meno" type="string" />
+          <camunda:formField id="priezvisko" label="Priezvisko" type="string" />
+          <camunda:formField id="datumNar" label="Dátum narodenia" type="date" />
+          <camunda:formField id="emailAddress" label="Email" type="string" />
+          <camunda:formField id="carBrand" label="Značka vozidla" type="enum">
+            <camunda:value id="brandSkoda" name="Škoda" />
+            <camunda:value id="brandAudi" name="Audi" />
+            <camunda:value id="brandToyota" name="Toyota" />
+            <camunda:value id="brandPorsche" name="Porsche" />
+          </camunda:formField>
+          <camunda:formField id="engineVolume" label="Objem motora" type="long">
+            <camunda:validation>
+              <camunda:constraint name="min" config="0" />
+            </camunda:validation>
+          </camunda:formField>
+          <camunda:formField id="performance" label="Výkon v Kw" type="long">
+            <camunda:validation>
+              <camunda:constraint name="min" config="0" />
+            </camunda:validation>
+          </camunda:formField>
+          <camunda:formField id="gasType" label="Typ paliva" type="enum">
+            <camunda:value id="gasDiesel" name="Nafta" />
+            <camunda:value id="gasNatural" name="Benzín" />
+            <camunda:value id="gasElectric" name="Elektrický pohon" />
+          </camunda:formField>
+          <camunda:formField id="evidenceYear" label="Rok evidencie vozidla" type="long">
+            <camunda:validation>
+              <camunda:constraint name="min" config="1950" />
+              <camunda:constraint name="max" config="2021" />
+            </camunda:validation>
+          </camunda:formField>
+          <camunda:formField id="spz" label="Evidenčné číslo vozidla (ŠPZ)" type="string" />
+        </camunda:formData>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_09cdwkt</bpmn:incoming>
+      <bpmn:outgoing>Flow_0lujkmt</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:subProcess id="Activity_0r6of5k" name="Akceptácia ceny zákazníkom" triggeredByEvent="true">
+      <bpmn:userTask id="Activity_0uug8vr" name="Oznámenie ceny zákazníkovi" camunda:candidateGroups="agenti">
+        <bpmn:extensionElements>
+          <camunda:formData>
+            <camunda:formField id="price" label="Navrhnutá cena" type="long">
+              <camunda:validation>
+                <camunda:constraint name="readonly" />
+              </camunda:validation>
+            </camunda:formField>
+            <camunda:formField id="accepted" label="Bola navrhovaná cena akceptovaná?" type="enum">
+              <camunda:validation>
+                <camunda:constraint name="required" />
+              </camunda:validation>
+              <camunda:value id="accepted" name="Áno" />
+              <camunda:value id="notAccepted" name="Nie" />
+            </camunda:formField>
+            <camunda:formField id="emailAddress" label="Adresa na odoslanie čísla zmluvy" type="string" />
+          </camunda:formData>
+        </bpmn:extensionElements>
+        <bpmn:incoming>Flow_19lkqzu</bpmn:incoming>
+        <bpmn:outgoing>Flow_0oympi8</bpmn:outgoing>
+      </bpmn:userTask>
+      <bpmn:exclusiveGateway id="Gateway_1v1y2tb" name="Akceptovaná?">
+        <bpmn:incoming>Flow_0oympi8</bpmn:incoming>
+        <bpmn:outgoing>Flow_1oinbr0</bpmn:outgoing>
+        <bpmn:outgoing>Flow_1bxqdzs</bpmn:outgoing>
+      </bpmn:exclusiveGateway>
+      <bpmn:endEvent id="Event_1gbpvsh">
+        <bpmn:incoming>Flow_1oinbr0</bpmn:incoming>
+        <bpmn:terminateEventDefinition id="TerminateEventDefinition_1or8xoi" />
+      </bpmn:endEvent>
+      <bpmn:sendTask id="Activity_0a8wy2t" name="Notifikácia procesu schvaľovania" camunda:class="delegates.ProcessMessagingDelegate">
+        <bpmn:extensionElements>
+          <camunda:inputOutput>
+            <camunda:inputParameter name="messageName">message_accepted</camunda:inputParameter>
+          </camunda:inputOutput>
+        </bpmn:extensionElements>
+        <bpmn:incoming>Flow_1bxqdzs</bpmn:incoming>
+      </bpmn:sendTask>
+      <bpmn:sequenceFlow id="Flow_1bxqdzs" name="Áno" sourceRef="Gateway_1v1y2tb" targetRef="Activity_0a8wy2t">
+        <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${accepted=="accepted"}</bpmn:conditionExpression>
+      </bpmn:sequenceFlow>
+      <bpmn:sequenceFlow id="Flow_1oinbr0" name="Nie" sourceRef="Gateway_1v1y2tb" targetRef="Event_1gbpvsh">
+        <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${accepted=="notAccepted"}</bpmn:conditionExpression>
+      </bpmn:sequenceFlow>
+      <bpmn:sequenceFlow id="Flow_0oympi8" sourceRef="Activity_0uug8vr" targetRef="Gateway_1v1y2tb" />
+      <bpmn:sequenceFlow id="Flow_19lkqzu" sourceRef="Event_0sbsuov" targetRef="Activity_0uug8vr" />
+      <bpmn:startEvent id="Event_0sbsuov" name="Cena bola navrhnutá " isInterrupting="false">
+        <bpmn:outgoing>Flow_19lkqzu</bpmn:outgoing>
+        <bpmn:messageEventDefinition id="MessageEventDefinition_0j3th36" messageRef="Message_1v53ahf" />
+      </bpmn:startEvent>
+    </bpmn:subProcess>
+  </bpmn:process>
+  <bpmn:error id="Error_04lcc21" name="chyba_duplicita" errorCode="chyba_duplicita" />
+  <bpmn:error id="Error_1tl0vha" />
+  <bpmn:message id="Message_1v53ahf" name="message_price" />
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Collaboration_1jo87qk">
+      <bpmndi:BPMNShape id="Participant_0xk7y9f_di" bpmnElement="Participant_0xk7y9f" isHorizontal="true">
+        <dc:Bounds x="129" y="120" width="1201" height="560" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_0lujkmt_di" bpmnElement="Flow_0lujkmt">
+        <di:waypoint x="640" y="310" />
+        <di:waypoint x="800" y="310" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_09cdwkt_di" bpmnElement="Flow_09cdwkt">
+        <di:waypoint x="308" y="310" />
+        <di:waypoint x="540" y="310" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1ka9u10_di" bpmnElement="Flow_1ka9u10">
+        <di:waypoint x="1150" y="187" />
+        <di:waypoint x="1242" y="187" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0fpsozt_di" bpmnElement="Flow_0fpsozt">
+        <di:waypoint x="900" y="249" />
+        <di:waypoint x="900" y="187" />
+        <di:waypoint x="1050" y="187" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="942" y="163" width="56" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1fd4p45_di" bpmnElement="Flow_1fd4p45">
+        <di:waypoint x="1150" y="307" />
+        <di:waypoint x="1242" y="307" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0h3c7d0_di" bpmnElement="Flow_0h3c7d0">
+        <di:waypoint x="900" y="307" />
+        <di:waypoint x="1050" y="307" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="949" y="289" width="52" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Activity_0s57ga8_di" bpmnElement="Activity_call_approval">
+        <dc:Bounds x="800" y="267" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
+        <dc:Bounds x="272" y="292" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="264" y="335" width="52" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0s7ef15_di" bpmnElement="Event_0nxnvgi">
+        <dc:Bounds x="1242" y="289" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1hju4lx_di" bpmnElement="Activity_05sedak">
+        <dc:Bounds x="1050" y="147" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1sxcyx9_di" bpmnElement="Event_0hunqu4">
+        <dc:Bounds x="1242" y="169" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1yqb3qx_di" bpmnElement="Activity_1uz13wt">
+        <dc:Bounds x="1050" y="267" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0amyjm3_di" bpmnElement="Activity_01c8ubq">
+        <dc:Bounds x="540" y="270" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0f23xh7_di" bpmnElement="Activity_0r6of5k" isExpanded="true">
+        <dc:Bounds x="330" y="400" width="670" height="250" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_19lkqzu_di" bpmnElement="Flow_19lkqzu">
+        <di:waypoint x="428" y="500" />
+        <di:waypoint x="540" y="500" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0oympi8_di" bpmnElement="Flow_0oympi8">
+        <di:waypoint x="640" y="500" />
+        <di:waypoint x="707" y="500" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1oinbr0_di" bpmnElement="Flow_1oinbr0">
+        <di:waypoint x="757" y="500" />
+        <di:waypoint x="884" y="500" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="812" y="482" width="17" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1bxqdzs_di" bpmnElement="Flow_1bxqdzs">
+        <di:waypoint x="732" y="525" />
+        <di:waypoint x="732" y="590" />
+        <di:waypoint x="852" y="590" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="775" y="563" width="20" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Activity_1u0tg8x_di" bpmnElement="Activity_0uug8vr">
+        <dc:Bounds x="540" y="460" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_1v1y2tb_di" bpmnElement="Gateway_1v1y2tb" isMarkerVisible="true">
+        <dc:Bounds x="707" y="475" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="698" y="445" width="70" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0xui8kr_di" bpmnElement="Event_1gbpvsh">
+        <dc:Bounds x="884" y="482" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0ueppfv_di" bpmnElement="Activity_0a8wy2t">
+        <dc:Bounds x="852" y="550" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_02hnsle_di" bpmnElement="Event_0sbsuov">
+        <dc:Bounds x="392" y="482" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="388" y="525" width="51" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0sbzoj2_di" bpmnElement="Event_0s7nyf3">
+        <dc:Bounds x="882" y="249" width="36" height="36" />
+      </bpmndi:BPMNShape>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>
